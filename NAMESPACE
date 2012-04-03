@@ -1,0 +1,16 @@
+useDynLib(DirichletMultinomial, .registration=TRUE)
+
+importFrom(stats, AIC, BIC)
+export(dmn, dmngroup,
+       goodnessOfFit, laplace, mixturewt, mixture, heatmapdmn,
+       cvdmngroup, roc, csubset)
+
+S3method(AIC, dmn)
+S3method(BIC, dmn)
+S3method(fitted, dmn)
+S3method(predict, dmn)
+S3method(print, dmn)
+
+S3method(predict, dmngroup)
+S3method(summary, dmngroup)
+S3method(print, dmngroup)

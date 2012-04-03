@@ -1,0 +1,332 @@
+%\VignetteIndexEntry{An introduction to DirichletMultinomial}
+%\VignetteDepends{}
+%\VignetteKeywords{Microbial metagenomic clustering and classification}
+%\VignettePackage{DirichletMultinomial}
+
+\documentclass[]{article}
+
+\usepackage{authblk}
+\usepackage{times}
+\usepackage{hyperref}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\DirichletMultinomial}{\Rpackage{DirichletMultinomial}}
+
+\title{\Rpackage{DirichletMultinomial} for Clustering and
+  Classification of Microbiome Data}
+\author{Martin Morgan}
+\date{Modified: 6 March 2012. Compiled: \today}
+
+\begin{document}
+
+\maketitle
+
+This document illustrates the main features of the
+\Rpackage{DirichletMultinomial} package, and in the process replicates
+key tables and figures from \cite{10.1371/journal.pone.0030126}.
+
+We start by loading the package, in addition to the packages
+\Rpackage{lattice} (for visualization) and \Rpackage{parallel} (for
+use of multiple cores during cross-validation).
+%% 
+<<library>>=
+library(DirichletMultinomial)
+library(lattice)
+library(xtable)
+library(parallel)
+@ 
+%% 
+We set the width of \R{} output to 70 characters, and the number of
+floating point digits displayed to two. The \Robject{full} flag is set
+to \Rcode{FALSE}, so that cached values are used instead of
+re-computing during production of this vignette. The package defines a
+set of standard colors; we use \Rcode{.qualitative} during
+visualization. \Rfunction{dev.off} is redefined to return without
+displaying results
+%% 
+<<colors>>=
+options(width=70, digits=2)
+full <- FALSE
+.qualitative <- DirichletMultinomial:::.qualitative
+dev.off <- function(...) invisible(grDevices::dev.off(...))
+@ 
+
+\section{Data}
+
+The data used in \cite{10.1371/journal.pone.0030126} is included in
+the package. We read the data in to a matrix \Robject{count} of
+samples $\times$ taxa.
+%% 
+<<data-input>>=
+fl <- system.file(package="DirichletMultinomial", "extdata",
+                  "Twins.csv")
+count <- t(as.matrix(read.csv(fl, row.names=1)))
+count[1:5, 1:3]
+@ 
+%% 
+Figure~\ref{fig:taxon-counts} shows the distribution of reads from each
+taxon, on a log scale.
+%% 
+<<taxon-counts>>=
+cnts <- log10(colSums(count))
+pdf("taxon-counts.pdf")
+densityplot(cnts, xlim=range(cnts),
+            xlab="Taxon representation (log 10 count)")
+dev.off()
+@ 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.65\textwidth]{taxon-counts}
+  \caption{Density of taxa, across samples}
+  \label{fig:taxon-counts}
+\end{figure}
+
+\section{Clustering}
+
+The \Rfunction{dmn} function fits a Dirichlet-Multinomial model,
+taking as input the count data and a parameter $k$ representing the
+number of Dirichlet components to model. Here we fit the count data to
+values of $k$ from 1 to 7, displaying the result for $k = 4$.  A
+sense of the model return value is provided by the structure of the
+\R{} object \Robject{fit}.
+%% 
+<<fit>>=
+if (full) {
+    fit <- mclapply(1:7, dmn, count=count, verbose=TRUE)
+    save(fit, file="~/DirichletMultinomial/data/fit.rda")
+} else data(fit)
+fit[[4]]
+names(fit[[4]])
+Filter(Negate(is.null), lapply(fit[[4]], names))
+@ 
+%% 
+The return value can be queried for measures of fit (Laplace, AIC,
+BIC); these are plotted for different $k$ in
+Figure~\ref{fig:min-laplace}. The best fit is for $k=4$ distinct
+Dirichlet components.
+%% 
+<<min-laplace, figure=TRUE>>=
+lplc <- sapply(fit, laplace)
+pdf("min-laplace.pdf")
+plot(lplc, type="b", xlab="Number of Dirichlet Components",
+     ylab="Model Fit")
+dev.off()
+(best <- fit[[which.min(lplc)]])
+@ 
+%% 
+In addition to \Rfunction{laplace} goodness of fit can be assessed
+with the \Rfunction{AIC} and \Rfunction{BIC} functions.  
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.65\textwidth]{min-laplace}
+  \caption{Model fit as a function of Dirichlet component number}
+  \label{fig:min-laplace}
+\end{figure}
+
+The \Rfunction{mixturewt} function reports the weight $\pi$ and
+homogeneity $\theta$ (large values are more homogeneous) of the fitted
+model. \Rfunction{mixture} returns a matrix of sample x estimated
+Dirichlet components; the argument \Rfunarg{assign} returns a vector
+of length equal to the number of samples indicating the component with
+maximum value.
+%% 
+<<mix-weight>>=
+mixturewt(best)
+head(mixture(best), 3)
+@ 
+%% 
+The \Rfunction{fitted} function describes the contribution of each
+taxonomic group (each point in the panels of Figure~\ref{fig:fitted}
+to the Dirichlet components; the diagonal nature of the points in a
+panel suggest that the Dirichlet components are correlated, perhaps
+reflecting overall numerical abundance.
+%% 
+<<fitted>>=
+pdf("fitted.pdf")
+splom(log(fitted(best)))
+dev.off()
+@ 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.65\textwidth]{fitted}
+  \caption{Taxa fitted to Dirichlet components 1-4.}
+  \label{fig:fitted}
+\end{figure}
+
+<<isoMDS>>=
+@ 
+
+<<isoMDS-plot, figure=TRUE>>=
+@ 
+
+The posterior mean difference between the best and single-component
+Dirichlet multinomial model measures how each component
+differs from the population average; the sum is a measure of total
+difference from the mean.
+%% 
+<<posterior-mean-diff>>=
+p0 <- fitted(fit[[1]], scale=TRUE)     # scale by theta
+p4 <- fitted(best, scale=TRUE)
+colnames(p4) <- paste("m", 1:4, sep="")
+(meandiff <- colSums(abs(p4 - as.vector(p0))))
+sum(meandiff)
+@ 
+%% 
+Table~\ref{tab:meandiff} summarizes taxonomic contributions to each
+Dirichlet component.
+%% 
+<<table-1>>=
+diff <- rowSums(abs(p4 - as.vector(p0)))
+o <- order(diff, decreasing=TRUE)
+cdiff <- cumsum(diff[o]) / sum(diff)
+df <- head(cbind(Mean=p0[o], p4[o,], diff=diff[o], cdiff), 10)
+@ 
+
+<<xtable, echo=FALSE, results=tex>>=
+xtbl <- xtable(df,
+    caption="Taxonomic contributions (10 largest) to Dirichlet components.",
+    label="tab:meandiff", align="lccccccc")
+print(xtbl, hline.after=0, caption.placement="top")
+@ 
+
+Figure~\ref{fig:heatmap1} shows samples arranged by Dirichlet
+component, with samples placed into the component for which they had
+the largest fitted value.
+%% 
+<<heatmap-similarity>>=
+pdf("heatmap1.pdf")
+heatmapdmn(count, fit[[1]], best, 30)
+dev.off()
+@ 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.65\textwidth]{heatmap1}
+  \caption{Samples arranged by Dirichlet component. Narrow columns are
+    samples, broader columns component averages. Rows are taxonomic
+    groups. Color represents square-root counts, with dark colors
+    corresponding to larger counts.}
+  \label{fig:heatmap1}  
+\end{figure}
+
+\section{Generative classifier}
+
+The following reads in phenotypic information (`Lean', `Obese',
+`Overweight') for each sample.
+%% 
+<<twin-pheno>>=
+fl <- system.file(package="DirichletMultinomial", "extdata",
+                  "TwinStudy.t")
+pheno0 <- scan("~/DirichletMultinomial/inst/extdata/TwinStudy.t")
+lvls <- c("Lean", "Obese", "Overwt")
+pheno <- factor(lvls[pheno0 + 1], levels=lvls)
+names(pheno) <- rownames(count)
+table(pheno)
+@ 
+%% 
+Here we subset the count data into sub-counts, one for each
+phenotype. We retain only the Lean and Obese groups for subsequent
+analysis.
+%% 
+<<subsets>>=
+counts <- sapply(levels(pheno), csubset, count, pheno)
+sapply(counts, dim)
+keep <- c("Lean", "Obese")
+count <- count[pheno %in% keep,]
+pheno <- factor(pheno[pheno %in% keep], levels=keep)
+@ 
+
+The \Rfunction{dmngroup} function identifies the best (minimum Laplace
+score) Dirichlet-multinomial model for each group. 
+%% 
+<<fit-several->>=
+if (full) {
+    bestgrp <- dmngroup(count, pheno, k=1:5, verbose=TRUE, 
+                        mc.preschedule=FALSE)
+    save(bestgrp, file="~/DirichletMultinomial/data/bestgrp.rda")
+} else data(bestgrp)
+@ 
+%% 
+The Lean group is described by a model with one component, the
+Obese group by a model with three components. Three of the four
+Dirichlet components of the original single group (\Rcode{best}) model
+are represented in the Obese group, the other in the Lean
+group. The total Laplace score of the two group model is less than of
+the single-group model, indicating information gain from considering
+groups separately.
+%% 
+<<best-several>>=
+bestgrp
+lapply(bestgrp, mixturewt)
+c(sapply(bestgrp, laplace),
+  `Lean+Obese`=sum(sapply(bestgrp, laplace)),
+  Single=laplace(best))
+@ 
+
+The \Rfunction{predict} function assigns samples to classes; the
+confusion matrix shows that the classifier is moderately effective.
+%% 
+<<confusion>>=
+xtabs(~pheno + predict(bestgrp, count, assign=TRUE))
+@ 
+%% 
+The \Rfunction{cvdmngroup} function performs cross-validation. This is
+a computationally expensive step.
+%% 
+<<cross-validate>>=
+if (full) {
+    ## full leave-one-out; expensive!
+    xval <- cvdmngroup(nrow(count), count, c(Lean=1, Obese=3), pheno,
+                       verbose=TRUE, mc.preschedule=FALSE)
+    save(xval, file="~/DirichletMultinomial/data/xval.rda")
+} else data(xval)
+@ 
+%% 
+Figure~\ref{fig:roc} shows an ROC curve for the single and two-group
+classifier. The single group classifier is performing better than the
+two-group classifier.
+%% 
+<<ROC-dmngroup>>=
+bst <- roc(pheno[rownames(count)] == "Obese",
+           predict(bestgrp, count)[,"Obese"])
+bst$Label <- "Single"
+two <- roc(pheno[rownames(xval)] == "Obese",
+           xval[,"Obese"])
+two$Label <- "Two group"
+both <- rbind(bst, two)
+pars <- list(superpose.line=list(col=.qualitative[1:2], lwd=2))
+pdf("roc.pdf")
+xyplot(TruePostive ~ FalsePositive, group=Label, both,
+       type="l", par.settings=pars,
+       auto.key=list(lines=TRUE, points=FALSE, x=.6, y=.1),
+       xlab="False Positive", ylab="True Positive")
+dev.off()
+@ 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.65\textwidth]{roc}
+  \caption{Receiver-operator curves for the single and two-group
+    classifiers.}
+  \label{fig:roc}
+\end{figure}
+
+<<sessionInfo, results=tex>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{abbrv}
+\bibliography{References}
+
+\end{document}
