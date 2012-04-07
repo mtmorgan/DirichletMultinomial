@@ -1,3 +1,12 @@
+setClass("DMNGroup", contains="SimpleList",
+    prototype=prototype(elementType="DMN"))
+
+.DMNGroup <-
+    function(...)
+{
+    new("DMNGroup", listData=list(...))
+}
+
 ## dmngroup
 
 dmngroup <-
@@ -23,13 +32,12 @@ dmngroup <-
         })
         Map("[[", ans1, opt)
     } else ans0
-    class(ans) <- "dmngroup"
-    ans
+    do.call(.DMNGroup, ans)
 }
 
 ## predict
 
-predict.dmngroup <-
+.predict.DMNGroup <-
     function(object, newdata, ..., assign=FALSE)
 {
     if (2 < length(object))
@@ -55,6 +63,8 @@ predict.dmngroup <-
         pr / rowSums(pr)
 }
 
+setMethod(predict, "DMNGroup", .predict.DMNGroup)
+
 ## cross-validation
 
 .cv_dmngroup <-
@@ -75,7 +85,7 @@ predict.dmngroup <-
         trains <- sapply(levels(trainz), csubset, train, trainz)
         fits <- Map(dmn, trains, k[levels(trainz)], ...,
                     verbose=verbose)
-        class(fits) <- "dmngroup"
+        fits <- do.call(.DMNGroup, fits)
         predict(fits, count[dropidx,,drop=FALSE], assign=FALSE)
     }, error=function(err) {
         message(".cv_dmngroup error: ", conditionMessage(err))
@@ -102,7 +112,7 @@ cvdmngroup <-
 
 ## summary / print / plot
 
-summary.dmngroup <-
+setMethod(summary, "DMNGroup",
     function(object, ...)
 {
     k <- data.frame(k=sapply(object, function(elt) ncol(mixture(elt))))
@@ -111,12 +121,12 @@ summary.dmngroup <-
     }))
     goodness <- t(sapply(object, goodnessOfFit))
     cbind(k=k, sxt, goodness)
-}
+})
 
-print.dmngroup <-
-    function(x, ...)
+setMethod(show, "DMNGroup",
+    function(object)
 {
-    cat("class:", class(x), "\n")
+    cat("class:", class(object), "\n")
     cat("summary:\n")
-    print(summary(x))
-}
+    print(summary(object))
+})

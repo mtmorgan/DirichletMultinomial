@@ -96,8 +96,8 @@ The \Rfunction{dmn} function fits a Dirichlet-Multinomial model,
 taking as input the count data and a parameter $k$ representing the
 number of Dirichlet components to model. Here we fit the count data to
 values of $k$ from 1 to 7, displaying the result for $k = 4$.  A
-sense of the model return value is provided by the structure of the
-\R{} object \Robject{fit}.
+sense of the model return value is provided by the documentation for the
+\R{} object \Robject{fit}, \Rcode{class ? DMN}.
 %% 
 <<fit>>=
 if (full) {
@@ -105,8 +105,6 @@ if (full) {
     save(fit, file="~/DirichletMultinomial/data/fit.rda")
 } else data(fit)
 fit[[4]]
-names(fit[[4]])
-Filter(Negate(is.null), lapply(fit[[4]], names))
 @ 
 %% 
 The return value can be queried for measures of fit (Laplace, AIC,

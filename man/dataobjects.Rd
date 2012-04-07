@@ -20,9 +20,9 @@ data(xval)
 }
 \format{
 
-  \code{fit} is a list of seven \code{dmn} objects.
+  \code{fit} is a list of seven \code{\linkS4class{DMN}} objects.
 
-  \code{bestgrp} is a \code{dmngroup} object.
+  \code{bestgrp} is a \code{\linkS4class{DMNGroup}} object.
 
   \code{xval} is a \code{data.frame} with columns corresponding to the
   cross-validation group membership and the Lean and Obese posterior

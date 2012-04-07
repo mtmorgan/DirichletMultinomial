@@ -11,7 +11,9 @@ Description: Dirichlet-multinomial mixture models can be used to
     Harris, and Quince, 2012, PLoS ONE 7(2): 1-15, as discussed
     further in the man page for this package, ?DirichletMultinomial.
 License: LGPL
-Depends: stats
+Depends: IRanges
+Imports: stats4, methods
 Suggests: lattice, parallel, MASS, RColorBrewer, xtable
-Collate: dmn.R dmngroup.R roc.R util.R
+Collate: AllGenerics.R dmn.R dmngroup.R roc.R util.R
 SystemRequirements: gsl
+biocViews: HighThroughputSequencing, Clustering, Classification

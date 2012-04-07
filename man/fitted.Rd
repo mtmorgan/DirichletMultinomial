@@ -3,10 +3,15 @@
 \alias{mixturewt}
 \alias{goodnessOfFit}
 \alias{laplace}
-\alias{AIC.dmn}
-\alias{BIC.dmn}
-\alias{fitted.dmn}
-\alias{predict.dmn}
+\alias{AIC,DMN-method}
+\alias{BIC,DMN-method}
+\alias{fitted,DMN-method}
+\alias{predict,DMN-method}
+\alias{show,DMN-method}
+\alias{fitted,DMNGroup-method}
+\alias{predict,DMNGroup-method}
+\alias{summary,DMNGroup-method}
+\alias{show,DMNGroup-method}
 
 \title{Access model components.}
 
@@ -22,11 +27,14 @@ mixture(object, ..., assign=FALSE)
 mixturewt(object, ...)
 goodnessOfFit(object, ...)
 laplace(object, ...)
-\S3method{AIC}{dmn}(object, ...)
-\S3method{BIC}{dmn}(object, ...)
+\S4method{AIC}{DMN}(object, ..., k = 2)
+\S4method{BIC}{DMN}(object, ...)
 
-\S3method{fitted}{dmn}(object, ..., scale=FALSE)
-\S3method{predict}{dmn}(object, newdata, ..., logevidence=FALSE)
+\S4method{fitted}{DMN}(object, ..., scale=FALSE)
+\S4method{predict}{DMN}(object, newdata, ..., logevidence=FALSE)
+\S4method{fitted}{DMNGroup}(object, ...)
+\S4method{predict}{DMNGroup}(object, newdata, ..., assign=FALSE)
+\S4method{summary}{DMNGroup}(object, ...)
 }
 
 \arguments{
@@ -51,6 +59,8 @@ laplace(object, ...)
   \item{logevidence}{\code{logical(1)} indicating whether posterior
     probability (default, \code{logevidence=FALSE}) or log evidence
     \code{logical=TRUE} should be returned.}
+
+  \item{k}{ignored.}
 
 }
 

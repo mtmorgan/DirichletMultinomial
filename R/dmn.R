@@ -1,3 +1,14 @@
+setClass("DMN",
+    representation=representation(goodnessOfFit="numeric",
+      group="matrix", mixture="list", fit="list"))
+
+.DMN <-
+    function(goodnessOfFit, group, mixture, fit, ...)
+{
+    new("DMN", goodnessOfFit=goodnessOfFit, group=group,
+        mixture=mixture, fit=fit, ...)
+}
+
 dmn <-
     function(count, k, verbose=FALSE,
              seed=runif(1, 0, .Machine$integer.max))
@@ -13,8 +24,9 @@ dmn <-
         Mixture$Weight <- Mixture$Weight[o]
         Fit <- lapply(Fit, function(elt, o) elt[, o, drop=FALSE], o)
     })
-    class(ans) <- "dmn"
-    ans
+    with(ans,
+         .DMN(goodnessOfFit=GoodnessOfFit, group=Group,
+              mixture=Mixture, fit=Fit))
 }
 
 ## k-means
@@ -25,33 +37,39 @@ mixture <-
     if (assign) {
         apply(mixture(object), 1, which.max)
     } else {
-        object$Group
+        object@group
     }
 }
 
 ## Dirichlet
 
-goodnessOfFit <- function(object, ...) object$GoodnessOfFit
+goodnessOfFit <- function(object, ...) object@goodnessOfFit
 
 laplace <- function(object, ...) goodnessOfFit(object)[["Laplace"]]
 
-AIC.dmn <- function(object, ...) goodnessOfFit(object)[["AIC"]]
+.AIC.DMN <- function(object, ...) goodnessOfFit(object)[["AIC"]]
 
-BIC.dmn <- function(object, ...) goodnessOfFit(object)[["BIC"]]
+setMethod(AIC, "DMN", .AIC.DMN)
+
+.BIC.DMN <- function(object, ...) goodnessOfFit(object)[["BIC"]]
+
+setMethod(BIC, "DMN", .BIC.DMN)
 
 mixturewt <-
     function(object, ...)
 {
-    data.frame(pi=object$Mixture$Weight, theta=colSums(fitted(object)))
+    data.frame(pi=object@mixture$Weight, theta=colSums(fitted(object)))
 }
 
-fitted.dmn <- function(object, ..., scale=FALSE)
+.fitted.DMN <- function(object, ..., scale=FALSE)
 {
-    fit <- object$Fit$Estimate
+    fit <- object@fit$Estimate
     if (scale)
         fit <- scale(fit, FALSE, mixturewt(object)$theta)
     fit
 }
+
+setMethod(fitted, "DMN", .fitted.DMN)
 
 ## predict
 
@@ -63,7 +81,7 @@ fitted.dmn <- function(object, ..., scale=FALSE)
     -(.B(x + alpha) - .B(alpha))
 }
 
-predict.dmn <- 
+.predict.DMN <- 
     function(object, newdata, ..., logevidence=FALSE)
 {
     if (is.vector(newdata))
@@ -87,17 +105,20 @@ predict.dmn <-
     }
 }
 
+setMethod(predict, "DMN", .predict.DMN)
+
 ## print / plot
 
-print.dmn <-
-    function(x, ...)
+setMethod(show, "DMN",
+    function(object)
 {
-    cat("class:", class(x), "\n")
-    cat("k:", ncol(mixture(x)), "\n")
-    cat("samples x taxa:", nrow(mixture(x)), "x", nrow(fitted(x)), "\n")
-    cat("Laplace:", laplace(x), "BIC:", BIC(x), "AIC:", AIC(x), "\n")
-
-}
+    cat("class:", class(object), "\n")
+    cat("k:", ncol(mixture(object)), "\n")
+    cat("samples x taxa:", nrow(mixture(object)), "x",
+        nrow(fitted(object)), "\n")
+    cat("Laplace:", laplace(object), "BIC:", BIC(object),
+        "AIC:", AIC(object), "\n")
+})
 
 heatmapdmn <- 
     function(count, fit1, fitN, ntaxa=30, ..., transform=sqrt,
