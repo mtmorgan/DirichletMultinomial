@@ -48,7 +48,7 @@ count <- t(as.matrix(read.csv(fl, row.names=1)))
 ## phenotype
 fl <- system.file(package="DirichletMultinomial", "extdata",
                   "TwinStudy.t")
-pheno0 <- scan("~/DirichletMultinomial/inst/extdata/TwinStudy.t")
+pheno0 <- scan(fl)
 lvls <- c("Lean", "Obese", "Overwt")
 pheno <- factor(lvls[pheno0 + 1], levels=lvls)
 names(pheno) <- rownames(count)
