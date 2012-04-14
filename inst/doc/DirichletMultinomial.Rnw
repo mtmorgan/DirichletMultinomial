@@ -102,7 +102,7 @@ sense of the model return value is provided by the documentation for the
 <<fit>>=
 if (full) {
     fit <- mclapply(1:7, dmn, count=count, verbose=TRUE)
-    save(fit, file="~/DirichletMultinomial/data/fit.rda")
+    save(fit, file=file.path(tempdir(), "fit.rda"))
 } else data(fit)
 fit[[4]]
 @ 
@@ -252,7 +252,7 @@ score) Dirichlet-multinomial model for each group.
 if (full) {
     bestgrp <- dmngroup(count, pheno, k=1:5, verbose=TRUE, 
                         mc.preschedule=FALSE)
-    save(bestgrp, file="~/DirichletMultinomial/data/bestgrp.rda")
+    save(bestgrp, file=file.path(tempdir(), "bestgrp.rda"))
 } else data(bestgrp)
 @ 
 %% 
@@ -287,7 +287,7 @@ if (full) {
     ## full leave-one-out; expensive!
     xval <- cvdmngroup(nrow(count), count, c(Lean=1, Obese=3), pheno,
                        verbose=TRUE, mc.preschedule=FALSE)
-    save(xval, file="~/DirichletMultinomial/data/xval.rda")
+    save(xval, file=file.path(tempdir(), "xval.rda"))
 } else data(xval)
 @ 
 %% 
