@@ -5,7 +5,8 @@ SEXP dirichlet_fit(SEXP counts, SEXP n_components, SEXP verbose,
                    SEXP seed)
 {
     /* counts: N communities x S taxa */
-    struct data_t *data = Calloc(1, struct data_t);
+    struct data_t *data =
+        (struct data_t *) R_alloc(1, sizeof(struct data_t));
 
     /* inputs */
     SEXP dim = Rf_getAttrib(counts, R_DimSymbol),

@@ -1,16 +1,15 @@
-#include <R_ext/RS.h>           /* Calloc / Free */
-#include <R_ext/Print.h>        /* Rprintf */
-#include <R_ext/Arith.h>        /* R_NaN, ... */
-#include <R_ext/Utils.h>        /* R_CheckUserInterrupt */
-
-#include "dirichlet_fit_main.h"
-
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_sf.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_permutation.h>
+
+#include <Rdefines.h>
+#include "dirichlet_fit_main.h"
+/* re-map to R transient memory allocation */
+#define calloc(_nelm, _elsize) R_alloc(_nelm, _elsize)
+#define free(_ptr) (void) _ptr
 
 const double BIG_DBL = 1.0e9;
 const double K_MEANS_THRESH = 1.0e-6;
@@ -33,10 +32,10 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
     if (data->verbose)
         Rprintf("  Soft kmeans\n");
 
-    aadY = Calloc(N, double *);
-    aadY[0] = Calloc(N * S, double);
+    aadY = (double **) calloc(N, sizeof(double *));
+    aadY[0] = (double *) calloc(N * S, sizeof(double));
 
-    adMu = Calloc(S, double);
+    adMu = (double *) calloc(S, sizeof(double));
 
     for (i = 0; i < N; i++) {
         double dTotal = 0.0;
@@ -101,8 +100,8 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
             Rprintf("    iteration %d change %f\n", iter, dMaxChange);
     }
 
-    Free(aadY[0]); free(aadY);
-    Free(adMu);
+    free(aadY[0]); free(aadY);
+    free(adMu);
 }
 
 static double neg_log_evidence_lambda_pi(const gsl_vector *lambda,
@@ -448,15 +447,15 @@ void dirichlet_fit_main(struct data_t *data, int rseed)
 
     /* allocate matrices */
     double **aadZ, **aadLambda, **aadErr, *adW;
-    adW = Calloc(K, double);
+    adW = (double *) calloc(K, sizeof(double));
 
-    aadZ = Calloc(K, double *);
-    aadLambda = Calloc(K, double *);
-    aadErr = Calloc(K, double*);
+    aadZ = (double **) calloc(K, sizeof(double *));
+    aadLambda = (double **) calloc(K, sizeof(double *));
+    aadErr = (double **) calloc(K, sizeof(double*));
 
-    aadZ[0] = Calloc(K * N, double);
-    aadLambda[0] = Calloc(K * S, double);
-    aadErr[0] = Calloc(K * S, double);
+    aadZ[0] = (double *) calloc(K * N, sizeof(double));
+    aadLambda[0] = (double *) calloc(K * S, sizeof(double));
+    aadErr[0] = (double *) calloc(K * S, sizeof(double));
 
     for (k = 1; k < K; k++) {
         aadZ[k] = aadZ[0] + k * N;
@@ -502,7 +501,7 @@ void dirichlet_fit_main(struct data_t *data, int rseed)
         dChange = fabs(dNLL - dNew);
         dNLL = dNew;
         iter++;
-        R_CheckUserInterrupt(); /* FIXME: memory leak on interrupt */
+        R_CheckUserInterrupt();
         if (data->verbose && (iter % 10) == 0)
             Rprintf("    iteration %d change %f\n", iter, dChange);
     }
@@ -545,8 +544,8 @@ void dirichlet_fit_main(struct data_t *data, int rseed)
     group_output(data, aadZ);
     mixture_output(data, adW, aadLambda, aadErr);
 
-    Free(aadErr[0]); Free(aadErr);
-    Free(aadLambda[0]); Free(aadLambda);
-    Free(aadZ[0]); Free(aadZ);
-    Free(adW);
+    free(aadErr[0]); free(aadErr);
+    free(aadLambda[0]); free(aadLambda);
+    free(aadZ[0]); free(aadZ);
+    free(adW);
 }

@@ -1,2 +1,2 @@
-PKG_CFLAGS = `gsl-config --cflags`
+PKG_CFLAGS = `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL
 PKG_LIBS = `gsl-config --libs`
