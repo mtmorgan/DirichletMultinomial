@@ -2,7 +2,7 @@ Package: DirichletMultinomial
 Type: Package
 Title: Dirichlet-Multinomial Mixture Model Machine Learning for
     Microbiome Data
-Version: 0.99.1
+Version: 0.99.2
 Author: Martin Morgan <mtmorgan@fhcrc.org>
 Maintainer: Martin Morgan <mtmorgan@fhcrc.org>
 Description: Dirichlet-multinomial mixture models can be used to
@@ -10,7 +10,7 @@ Description: Dirichlet-multinomial mixture models can be used to
     is an interface to code originally made available by Holmes,
     Harris, and Quince, 2012, PLoS ONE 7(2): 1-15, as discussed
     further in the man page for this package, ?DirichletMultinomial.
-License: LGPL
+License: LGPL-3
 Depends: IRanges
 Imports: stats4, methods
 Suggests: lattice, parallel, MASS, RColorBrewer, xtable
