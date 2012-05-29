@@ -26,27 +26,25 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
         *aanX = data->aanX;
     int i, j, k, iter = 0;
 
-    double **aadY, *adMu;
+    double *aadY, *adMu;
     double dMaxChange = BIG_DBL;
 
     if (data->verbose)
         Rprintf("  Soft kmeans\n");
 
-    aadY = (double **) calloc(N, sizeof(double *));
-    aadY[0] = (double *) calloc(N * S, sizeof(double));
+    aadY = (double *) calloc(N *S, sizeof(double));
 
     adMu = (double *) calloc(S, sizeof(double));
 
     for (i = 0; i < N; i++) {
         double dTotal = 0.0;
-        aadY[i] = aadY[0] + i * S;
         for (j = 0; j < S; j++)
             dTotal += aanX[j * N + i];
         for (j = 0; j < S; j++)
-            aadY[i][j] = (aanX[j * N + i]) / dTotal;
+            aadY[j * N + i] = (aanX[j * N + i]) / dTotal;
     }
 
-    /* initialse */
+    /* initialise */
     for (i = 0; i < N; i++) {
         k = gsl_rng_uniform_int (ptGSLRNG, K);
         for (j = 0; j < K; j++)
@@ -65,7 +63,7 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
             for (j = 0; j < S; j++) {
                 adMu[j] = 0.0;
                 for (k = 0; k < N; k++)
-                    adMu[j] += aadZ[i][k]*aadY[k][j];
+                    adMu[j] += aadZ[i][k] * aadY[j * N + k];
             }
 
             for (j = 0; j < S; j++) {
@@ -86,7 +84,7 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
             for (k = 0; k < K; k++) {
                 adDist[k] = 0.0;
                 for (j = 0; j < S; j++) {
-                    double dDiff = (aadMu[k][j] - aadY[i][j]);
+                    const double dDiff = aadMu[k][j] - aadY[j * N + i];
                     adDist[k] += dDiff * dDiff;
                 }
                 adDist[k] = sqrt(adDist[k]);
@@ -96,11 +94,11 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
                 aadZ[k][i] = exp(-SOFT_BETA * adDist[k]) / dNorm;
         }
         iter++;
-        if (data->verbose && (iter % 50 == 0))
+        if (data->verbose && (iter % 10 == 0))
             Rprintf("    iteration %d change %f\n", iter, dMaxChange);
     }
 
-    free(aadY[0]); free(aadY);
+    free(aadY);
     free(adMu);
 }
 
@@ -125,11 +123,14 @@ static double neg_log_evidence_lambda_pi(const gsl_vector *lambda,
         dLogEAlpha += gsl_sf_lngamma(dAlpha);
         dSumLambda += dLambda;
         dSumAlpha += dAlpha;
+        const double lngammaAlpha0 = gsl_sf_lngamma(dAlpha);
         for (i = 0; i < N; i++) {
             const double dN = aanX[j * N + i];
             const double dAlphaN = dAlpha + dN;
+            const double lngammaAlphaN =
+                dN ? gsl_sf_lngamma(dAlphaN) : lngammaAlpha0;
             adSumAlphaN[i] += dAlphaN; /*weight by pi*/
-            dLogE -= adPi[i] * gsl_sf_lngamma(dAlphaN); /*weight by pi*/
+            dLogE -= adPi[i] * lngammaAlphaN; /*weight by pi*/
         }
     }
     dLogEAlpha -= gsl_sf_lngamma(dSumAlpha);
@@ -162,9 +163,13 @@ static void neg_log_derive_evidence_lambda_pi(const gsl_vector *ptLambda,
         adAlpha[j] = exp(gsl_vector_get(ptLambda, j));
         dStore += adAlpha[j];
         adDeriv[j] = dWeight* gsl_sf_psi(adAlpha[j]);
+        double alphaS0 = gsl_sf_psi(adAlpha[j]);
         for (i = 0; i < N; i++) {
-            double dAlphaN = adAlpha[j] + aanX[j * N + i];
-            adDeriv[j] -= adPi[i]*gsl_sf_psi (dAlphaN);
+            int dN = aanX[j * N + i];
+            double dAlphaN = adAlpha[j] + dN;
+
+            double psiAlphaN = dN ? gsl_sf_psi(dAlphaN) : alphaS0;
+            adDeriv[j] -= adPi[i] * psiAlphaN;
             adStore[i] += dAlphaN;
         }
     }
@@ -234,7 +239,8 @@ static void optimise_lambda_k(double *adLambdaK, struct data_t *data,
 }
 
 static double neg_log_evidence_i(const struct data_t *data,
-                                 const int *anX, const double* adLambda)
+                                 const int *anX, const double* adLambda,
+                                 const double* aadLnGammaLambda0)
 {
     int j;
     const int S = data->S, N = data->N;
@@ -242,13 +248,14 @@ static double neg_log_evidence_i(const struct data_t *data,
         dSumAlphaN = 0.0;
 
     for (j = 0; j < S; j++) {
+        const double n = anX[j * N];
         const double dAlpha = exp(adLambda[j]);
-        const double dAlphaN = anX[j * N] + dAlpha;
+        const double dAlphaN = n + dAlpha;
 
-        dLogEAlpha += gsl_sf_lngamma(dAlpha);
+        dLogEAlpha += aadLnGammaLambda0[j];
         dSumAlpha += dAlpha;
         dSumAlphaN += dAlphaN;
-        dLogE -= gsl_sf_lngamma(dAlphaN);
+        dLogE -= n ? gsl_sf_lngamma(dAlphaN) : aadLnGammaLambda0[j] ;
     }
 
     dLogEAlpha -= gsl_sf_lngamma(dSumAlpha);
@@ -260,16 +267,25 @@ static double neg_log_evidence_i(const struct data_t *data,
 static void calc_z(double **aadZ, const struct data_t *data,
                    const double *adW, double **aadLambda)
 {
-    int i, k;
-    const int N = data->N, K = data->K;
+    int i, k, j;
+    const int N = data->N, K = data->K, S = data->S;
     double adStore[K];
+    double *aadLngammaLambda0 = (double*)calloc(S*K,sizeof(double));
+
+    for(k = 0; k < K; k++) {
+        for(j = 0; j < S; j++) {
+            const double dAlpha = exp(aadLambda[k][j]);
+            aadLngammaLambda0[k*S +j] = gsl_sf_lngamma(dAlpha);
+        }
+    }
 
     for (i = 0; i < N; i ++) {
         double dSum = 0.0;
         double dOffset = BIG_DBL;
         for (k = 0; k < K; k++) {
             double dNegLogEviI =
-                neg_log_evidence_i(data, data->aanX + i, aadLambda[k]);
+                neg_log_evidence_i(data, data->aanX + i, aadLambda[k],
+                                   aadLngammaLambda0 + k*S);
             if (dNegLogEviI < dOffset)
                 dOffset = dNegLogEviI;
             adStore[k] = dNegLogEviI;
@@ -293,14 +309,19 @@ static double neg_log_likelihood(double *adW, double** aadLambda,
     double dRet = 0.0, dL5 = 0.0, dL6 = 0.0, dL7 = 0.0, dL8 = 0.0;
     double dK = K, dN = N, dS = S;
 
+    double *aadLngammaLambda0 = (double*)calloc(S*K,sizeof(double));
+
     for (k = 0; k < K; k++){
         double dSumAlphaK = 0.0;
         adLogBAlpha[k] = 0.0;
         adPi[k] = adW[k]/dN;
         for (j = 0; j < S; j++){
             double dAlpha = exp(aadLambda[k][j]);
+            double lngammaAlpha = gsl_sf_lngamma(dAlpha);
+            aadLngammaLambda0[k * S + j] = lngammaAlpha;
+
             dSumAlphaK += dAlpha;
-            adLogBAlpha[k] += gsl_sf_lngamma(dAlpha);
+            adLogBAlpha[k] += lngammaAlpha;
         }
         adLogBAlpha[k] -= gsl_sf_lngamma(dSumAlphaK);
     }
@@ -318,9 +339,11 @@ static double neg_log_likelihood(double *adW, double** aadLambda,
         for (k = 0; k < K; k++) {
             double dSumAlphaKN = 0.0, dLogBAlphaN = 0.0;
             for (j = 0; j < S; j++) {
-                double dAlphaN = exp(aadLambda[k][j]) + aanX[j * N + i];
+                int countN = aanX[j * N + i];
+                double dAlphaN = exp(aadLambda[k][j]) + countN;
                 dSumAlphaKN += dAlphaN;
-                dLogBAlphaN += gsl_sf_lngamma(dAlphaN);
+                dLogBAlphaN += countN ? gsl_sf_lngamma(dAlphaN) :
+                    aadLngammaLambda0[k * S + j];
             }
             dLogBAlphaN -= gsl_sf_lngamma(dSumAlphaKN);
             adLogStore[k] = dLogBAlphaN - adLogBAlpha[k] - dFactor;
@@ -361,11 +384,14 @@ static void hessian(gsl_matrix* ptHessian, const double* adLambda,
         adAlpha[j] = exp(adLambda[j]);
         dAlphaSum += adAlpha[j];
         adAJK0[j] = adAJK[j] = adCJK0[j] = adCJK[j] = 0.0;
+        const double dPsiAlpha = gsl_sf_psi(adAlpha[j]);
+        const double dPsi1Alpha = gsl_sf_psi_1(adAlpha[j]);
         for (i = 0; i < N; i++) {
-            adCJK0[j] += adPi[i] * gsl_sf_psi(adAlpha[j] + aanX[j * N + i]);
-            adAJK0[j] += adPi[i] * gsl_sf_psi(adAlpha[j]);
-            adCJK[j] += adPi[i] * gsl_sf_psi_1(adAlpha[j] + aanX[j * N + i]);
-            adAJK[j] += adPi[i] * gsl_sf_psi_1(adAlpha[j]);
+            const int n = aanX[j * N + i];
+            adCJK0[j] += adPi[i] * n ? gsl_sf_psi(adAlpha[j] + n) : dPsiAlpha;
+            adAJK0[j] += adPi[i] * dPsiAlpha;
+            adCJK[j] += adPi[i] * n ? gsl_sf_psi_1(adAlpha[j] + n): dPsi1Alpha;
+            adAJK[j] += adPi[i] * dPsi1Alpha;
         }
     }
 
