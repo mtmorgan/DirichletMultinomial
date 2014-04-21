@@ -2,8 +2,9 @@ useDynLib(DirichletMultinomial, .registration=TRUE)
 
 import(methods)
 importFrom(stats4, AIC, BIC, summary)
+importClassesFrom(S4Vectors, Annotated)
 importMethodsFrom(IRanges, length, lapply, Map, names, sapply)
-importClassesFrom(IRanges, SimpleList, List, Vector, Annotated)
+importClassesFrom(IRanges, SimpleList, List, Vector)
 
 exportClasses(DMN, DMNGroup)
 export(dmn, dmngroup,
