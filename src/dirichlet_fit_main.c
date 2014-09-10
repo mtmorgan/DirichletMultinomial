@@ -32,7 +32,7 @@ static void kmeans(struct data_t *data, gsl_rng *ptGSLRNG,
     if (data->verbose)
         Rprintf("  Soft kmeans\n");
 
-    aadY = (double *) calloc(N *S, sizeof(double));
+    aadY = (double *) calloc(N * S, sizeof(double));
 
     adMu = (double *) calloc(S, sizeof(double));
 
