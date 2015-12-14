@@ -12,7 +12,8 @@
 }
 \usage{
 
-dmngroup(count, group, k, ..., simplify = TRUE, .lapply = mclapply)
+dmngroup(count, group, k, ..., simplify = TRUE,
+    .lapply = parallel::mclapply)
 
 }
 \arguments{

@@ -10,7 +10,8 @@
 
 }
 \usage{
-cvdmngroup(ncv, count, k, z, ..., verbose = FALSE, .lapply = mclapply)
+cvdmngroup(ncv, count, k, z, ..., verbose = FALSE,
+    .lapply = parallel::mclapply)
 }
 
 \arguments{
