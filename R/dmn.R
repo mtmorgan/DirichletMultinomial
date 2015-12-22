@@ -17,8 +17,6 @@ dmn <-
         message(sprintf("dmn, k=%d", k))
     if (any(rowSums(count) == 0L))
         stop("some 'rowSums()' on the dmn() count matrix equal 0")
-    if (any(colSums(count) == 0L))
-        stop("some 'colSums()' on the dmn() count matrix equal 0")
     mode(count) <- "integer"
     ans <- .Call(.dirichlet_fit, count, as.integer(k),
                  as.logical(verbose), as.integer(seed))

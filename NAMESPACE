@@ -4,7 +4,7 @@ import(methods)
 importFrom(stats4, AIC, BIC, summary)
 importClassesFrom(S4Vectors, Annotated, Vector)
 importMethodsFrom(IRanges, length, lapply, names)
-importMethodsFrom(S4Vectors, Map, sapply)
+importMethodsFrom(BiocGenerics, Map, sapply)
 importClassesFrom(S4Vectors, SimpleList, List)
 
 exportClasses(DMN, DMNGroup)

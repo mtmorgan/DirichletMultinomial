@@ -238,7 +238,7 @@ phenotype. We retain only the Lean and Obese groups for subsequent
 analysis.
 %% 
 <<subsets>>=
-counts <- sapply(levels(pheno), csubset, count, pheno)
+counts <- lapply(levels(pheno), csubset, count, pheno)
 sapply(counts, dim)
 keep <- c("Lean", "Obese")
 count <- count[pheno %in% keep,]

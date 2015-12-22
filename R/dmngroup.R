@@ -17,7 +17,9 @@ dmngroup <-
     if (!is.factor(group))
         group <- factor(group)
 
-    counts <- sapply(levels(group), csubset, count, group)
+    lvls <- setNames(nm=levels(group))
+    counts <- lapply(lvls, csubset, count, group)
+
     tasks <- expand.grid(group=names(counts), k=k)
     tid <- seq_len(nrow(tasks))
     ans0 <- .lapply(tid, function(i, tasks, counts, ...) {
