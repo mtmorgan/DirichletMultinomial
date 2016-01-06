@@ -13,7 +13,7 @@ Description: Dirichlet-multinomial mixture models can be used to
         ?DirichletMultinomial.
 License: LGPL-3
 Depends: S4Vectors, IRanges
-Imports: stats4, methods
+Imports: stats4, methods, BiocGenerics
 Suggests: lattice, parallel, MASS, RColorBrewer, xtable
 Collate: AllGenerics.R dmn.R dmngroup.R roc.R util.R
 SystemRequirements: gsl
