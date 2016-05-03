@@ -2,7 +2,7 @@ Package: DirichletMultinomial
 Type: Package
 Title: Dirichlet-Multinomial Mixture Model Machine Learning for
         Microbiome Data
-Version: 1.14.0
+Version: 1.15.0
 Author: Martin Morgan <martin.morgan@roswellpark.org>
 Maintainer: Martin Morgan <martin.morgan@roswellpark.org>
 Description: Dirichlet-multinomial mixture models can be used to
