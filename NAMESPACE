@@ -1,5 +1,8 @@
 useDynLib(DirichletMultinomial, .registration=TRUE)
 
+importFrom(graphics, axis, image, layout, par)
+importFrom(stats, runif, setNames)
+importFrom(utils, head)
 import(methods)
 importFrom(stats4, AIC, BIC, summary)
 importClassesFrom(S4Vectors, Annotated, Vector)
