@@ -128,6 +128,9 @@ heatmapdmn <-
 {
     p1 <- fitted(fit1, scale=TRUE)
     pN <- fitted(fitN, scale=TRUE)
+    if (!setequal(rownames(p1), rownames(pN)))
+        stop("taxa in 'fit1' and 'fitN' differ")
+    p1 <- p1[rownames(pN),, drop=FALSE]
     diff <- rowSums(abs(pN - as.vector(p1)))
     taxa <- rev(head(order(diff, decreasing=TRUE), ntaxa))
     pN <- pN[taxa,]
