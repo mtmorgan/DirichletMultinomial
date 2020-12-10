@@ -17,9 +17,8 @@
 
 \description{
   The accessors \code{mixture} and \code{mixturewt} return information
-  about the esimtated Dirichlet comonents of the fitted
-  model. \code{mixture} returns a sample x component matrix of estimated
-  values, \code{mixturewt} reta matrix of 
+  about the esimtated Dirichlet components of the fitted
+  model. Return values are described in the Values section, below.
 }
 
 \usage{
