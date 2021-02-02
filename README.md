@@ -31,7 +31,8 @@ On Fedora, CentOS or RHEL
 sudo yum install libgsl-devel
 ```
 
-On OS-X
+On macOS (source installations are not common on macOS, so this step
+may is not usually necessary)
 
 ```
 brew install gsl
