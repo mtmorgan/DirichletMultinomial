@@ -1,0 +1,320 @@
+---
+title: "DirichletMultinomial for Clustering and
+        Classification of Microbiome Data"
+author:
+- name: "Khadijah Amusat"
+  affiliation: "Vignette translation from Sweave to R Markdown / HTML"
+date: "`r format(Sys.time(), '%B %d , %Y')`"
+output:
+    BiocStyle::html_document:
+    number_sections: true
+    toc: true
+    toc_depth: 4
+bibliography: references.bib
+link-citations: TRUE
+package: DirichletMultinomial    
+vignette: >
+  %\VignetteIndexEntry{DirichletMultinomial for Clustering and
+                       Classification of Microbiome Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+  BiocStyle::markdown()
+```
+
+This document illustrates the main features of the `r
+Biocpkg("DirichletMultinomial")`, and in the process replicates key tables and
+figures from [@10.1371/journal.pone.0030126].
+We start by loading the package, in addition to the packages *lattice* (for
+visualization) and *parallel* (for use of multiple cores during
+cross-validation).
+
+```{r closeg, message = FALSE}
+library(DirichletMultinomial)
+library(lattice)
+library(xtable) 
+library(parallel)
+```
+
+We set the width of [R]{.sans-serif} output to 70 characters, and the number of
+floating point digits displayed to two. The [full]{.sans-serif} flag is set to
+`FALSE`, so that cached values are used instead of re-computing during
+production of this vignette. The package defines a set of standard colors; we
+use `.qualitative` during visualization. `dev.off` is redefined to return
+without displaying results
+
+```{r colors }
+options(width=70, digits=2)
+full <- FALSE
+.qualitative <- DirichletMultinomial:::.qualitative
+dev.off <- function(...) invisible(grDevices::dev.off(...))
+```
+
+# Data
+
+The data used in [@10.1371/journal.pone.0030126] is included in the package. We
+read the data in to a matrix `count` of samples $\times$ taxa.
+
+```{r data-input}
+fl <- system.file(package="DirichletMultinomial", "extdata",
+                          "Twins.csv")
+count <- t(as.matrix(read.csv(fl, row.names=1)))
+count[1:2, 1:3]
+```
+
+```{r taxon-counts}
+ cnts <- log10(colSums(count))
+ pdf("taxon-counts.pdf")
+ densityplot(cnts, xlim=range(cnts),
+  xlab="Taxon representation (log 10 count)")
+ dev.off()
+```
+
+
+
+```{r}
+count[3:5, 1:3]
+```
+
+<figure id="fig:vignettes-taxon-counts">
+![Density of taxa, across sample](%22vignettes-taxon-counts%22) <img
+src="taxon-counts"/>
+Figure [1](#fig:taxon-counts){reference-type="ref" reference="fig:taxon-counts"}
+shows the distribution of reads from each taxon, on a log scale.
+
+# Clustering
+The [dmn]{.sans-serif} function fits a Dirichlet-Multinomial model, taking as
+input the count data and a parameter $k$ representing the number of Dirichlet
+components to model. Here we fit the count data to values of $k$ from 1 to 7,
+displaying the result for $k = 4$. A sense of the model return value is provided
+by the documentation for the [R]{.sans-serif} object `fit`, `class ? DMN`.
+
+```{r fit}
+if (full) {
+   fit <- mclapply(1:7, dmn, count=count,verbose=TRUE) 
+   save(fit,file=file.path(tempdir(), "fit.rda"))
+  } else data(fit)
+   fit[[4]]
+
+```
+
+The return value can be queried for measures of fit (Laplace, AIC, BIC); these
+are plotted for different $k$ in
+Figure [2](#fig:min-laplace){reference-type="ref" reference="fig:min-laplace"}.
+The best fit is for $k=4$ distinct Dirichlet components.
+
+```{r min-laplace, figure=TRUE}
+lplc <- sapply(fit, laplace)
+ pdf("min-laplace.pdf")
+plot(lplc, type="b", xlab="Number of Dirichlet Components",
+    ylab="Model Fit")
+dev.off()
+(best <- fit[[which.min(lplc)]])
+
+```
+
+In addition to `laplace` goodness of fit can be assessed with the `AIC` and
+ `BIC` functions.
+
+
+<a id="fig:min-laplace">
+</a>
+```{r  echo = FALSE, fig.cap = "Model fit as a function of Dirichlet component number`"}
+knitr::include_graphics("min-laplace")
+```
+
+The `mixturewt` function reports the weight $\pi$ and homogeneity $\theta$
+(large values are more homogeneous) of the fitted model. `mixture` returns a
+matrix of sample x estimated Dirichlet components; the argument `assign` returns
+a vector of length equal to the number of samples indicating the component with
+maximum value.
+
+```{r mix-weight}
+mixturewt(best)
+head(mixture(best), 3)
+```
+
+The `fitted` function describes the contribution of each taxonomic group (each
+point in the panels of Figure [3](#fig:fitted){reference-type="ref"
+reference="fig:fitted"} to the Dirichlet components; the diagonal nature of the
+points in a panel suggest that the Dirichlet components are correlated, perhaps
+reflecting overall numerical abundance.
+
+```{r fitted}
+pdf("fitted.pdf")
+splom(log(fitted(best)))
+dev.off()
+```
+
+<a id="fig:fitted">
+</a>
+```{r  echo = FALSE, fig.cap = "Taxa fitted to Dirichlet components 1-4`"}
+knitr::include_graphics("fitted.pdf")
+```
+
+The posterior mean difference between the best and single-component Dirichlet
+multinomial model measures how each component differs from the population
+average; the sum is a measure of total difference from the mean.
+
+```{r posterior-mean-diff}
+p0 <- fitted(fit[[1]], scale=TRUE)     # scale by theta
+p4 <- fitted(best, scale=TRUE)
+colnames(p4) <- paste("m", 1:4, sep="")
+(meandiff <- colSums(abs(p4 - as.vector(p0))))
+```
+
+Table [$$tab:meandiff$$](#tab:meandiff){reference-type="ref"
+reference="tab:meandiff"} summarizes taxonomic contributions to each Dirichlet
+component.
+
+```{r table-1}
+diff <- rowSums(abs(p4 - as.vector(p0)))
+o <- order(diff, decreasing=TRUE)
+cdiff <- cumsum(diff[o]) / sum(diff)
+df <- head(cbind(Mean=p0[o], p4[o,], diff=diff[o], cdiff), 10)
+```
+
+```{r xtable, echo=FALSE, results=tex}
+xtbl <- xtable(df, caption="Taxonomic contributions (10 largest) to Dirichlet components.", label="tab:meandiff", align="lccccccc") print(xtbl, hline.after=0, caption.placement="top")
+```
+
+Figure~\ref{fig:heatmap1} shows samples arranged by Dirichlet component, with
+samples placed into the component for which they had the largest fitted value.
+
+```{r heatmap-similarity}
+pdf("heatmap1.pdf")
+heatmapdmn(count, fit[[1]], best, 30)
+dev.off()
+```
+
+<a id="fig:heatmap1">
+</a>
+
+```{r echo = FALSE, fig.cap = "Samples arranged by Dirichlet component. Narrow columns are
+samples, broader columns component averages. Rows are taxonomic
+ groups. Color represents square-root counts, with dark colors
+ corresponding to larger counts`"}
+knitr::include_graphics("heatmap1.pdf")
+```
+
+# Generative classifier 
+
+The following reads in phenotypic information (`Lean',
+`Obese', `Overweight') for each sample.
+
+```{r twin-pheno}
+fl <- system.file(package="DirichletMultinomial", "extdata",
+                  "TwinStudy.t")
+pheno0 <- scan(fl)
+lvls <- c("Lean", "Obese", "Overwt")
+pheno <- factor(lvls[pheno0 + 1], levels=lvls)
+names(pheno) <- rownames(count)
+table(pheno)
+```
+
+Here we subset the count data into sub-counts, one for each
+phenotype. We retain only the Lean and Obese groups for subsequent
+analysis.
+
+```{r subsets}
+counts <- lapply(levels(pheno), csubset, count, pheno)
+sapply(counts, dim)
+keep <- c("Lean", "Obese")
+count <- count[pheno %in% keep,]
+pheno <- factor(pheno[pheno %in% keep], levels=keep)
+```
+
+The `dmngroup` function identifies the best (minimum Laplace score)
+Dirichlet-multinomial model for each group.
+
+```{r fit-several }
+if (full) {
+ bestgrp <- dmngroup(count, pheno, k=1:5, verbose=TRUE,
+ mc.preschedule=FALSE)
+ save(bestgrp, file=file.path(tempdir(), "bestgrp.rda"))
+ } else data(bestgrp)
+
+```
+
+The Lean group is described by a model with one component, the Obese group by a
+model with three components. Three of the four Dirichlet components of the
+original single group (`best`) model are represented in the Obese group, the
+other in the Lean group. The total Laplace score of the two group model is less
+than of the single-group model, indicating information gain from considering
+groups separately.
+
+```{r best-several}
+bestgrp
+lapply(bestgrp, mixturewt)
+c(sapply(bestgrp, laplace),
+  `Lean+Obese`=sum(sapply(bestgrp, laplace)),
+  Single=laplace(best))
+```
+
+The `predict` function assigns samples to classes; the confusion matrix shows
+that the classifier is moderately effective.
+
+```{r confusion }
+xtabs(~pheno + predict(bestgrp, count, assign=TRUE))
+```
+
+The `cvdmngroup` function performs cross-validation. This is a computationally
+expensive step.
+
+```{r cross-validate}
+if (full) {
+    ## full leave-one-out; expensive!
+    xval <- cvdmngroup(nrow(count), count, c(Lean=1, Obese=3), pheno,
+                       verbose=TRUE, mc.preschedule=FALSE)
+    save(xval, file=file.path(tempdir(), "xval.rda"))
+} else data(xval)
+```
+
+
+```{r}
+fl <- system.file(package="DirichletMultinomial", "extdata",
+                  "TwinStudy.t")
+pheno0 <- scan(fl)
+lvls <- c("Lean", "Obese", "Overwt")
+pheno <- factor(lvls[pheno0 + 1], levels=lvls)
+names(pheno) <- rownames(count)
+table(pheno)
+```
+
+Figure [5](#fig:roc){reference-type="ref" reference="fig:roc"} shows an ROC
+curve for the single and two-group classifier. The single group classifier is
+performing better than the two-group classifier.
+
+```{r ROC-dmngroup}
+bst <- roc(pheno[rownames(count)] == "Obese",
+           predict(bestgrp, count)[,"Obese"])
+bst$Label <- "Single"
+two <- roc(pheno[rownames(xval)] == "Obese",
+           xval[,"Obese"])
+two$Label <- "Two group"
+both <- rbind(bst, two)
+pars <- list(superpose.line=list(col=.qualitative[1:2], lwd=2))
+pdf("roc.pdf")
+xyplot(TruePostive ~ FalsePositive, group=Label, both,
+       type="l", par.settings=pars,
+       auto.key=list(lines=TRUE, points=FALSE, x=.6, y=.1),
+       xlab="False Positive", ylab="True Positive")
+dev.off()
+```
+
+<a id="fig:fitted">
+</a>
+```{r  echo = FALSE, fig.cap = "Taxa fitted to Dirichlet components 1-4`"}
+knitr::include_graphics("fitted.pdf")
+```
+
+```{r tab}
+knitr::kable(dmngroup[1:8],10)
+             
+```
+
+```{r echo=FALSE}
+sessionInfo()
+```
