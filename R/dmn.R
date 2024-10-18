@@ -13,6 +13,9 @@ dmn <-
     function(count, k, verbose=FALSE,
              seed=runif(1, 0, .Machine$integer.max))
 {
+    stopifnot(
+        `'count' should be integer-valued` = count_is_integerish(count)
+    )
     if (verbose)
         message(sprintf("dmn, k=%d", k))
     if (any(rowSums(count) == 0L))
@@ -126,6 +129,9 @@ heatmapdmn <-
     function(count, fit1, fitN, ntaxa=30, ..., transform=sqrt,
              lblwidth=.2 * nrow(count), col=.gradient)
 {
+    stopifnot(
+        `'count' should be integer-valued` = count_is_integerish(count)
+    )
     p1 <- fitted(fit1, scale=TRUE)
     pN <- fitted(fitN, scale=TRUE)
     if (!setequal(rownames(p1), rownames(pN)))

@@ -12,6 +12,9 @@ setClass("DMNGroup", contains="SimpleList",
 dmngroup <-
     function(count, group, k, ..., simplify=TRUE, .lapply=parallel::mclapply)
 {
+    stopifnot(
+        `'count' should be integer-valued` = count_is_integerish(count)
+    )
     if (length(group) != nrow(count))
         stop("'length(group)' does not equal 'nrow(count)'")
     if (!is.factor(group))
@@ -99,6 +102,9 @@ setMethod(predict, "DMNGroup", .predict.DMNGroup)
 cvdmngroup <-
     function(ncv, count, k, z, ..., verbose=FALSE, .lapply=parallel::mclapply)
 {
+    stopifnot(
+        `'count' should be integer-valued` = count_is_integerish(count)
+    )
     n <- seq_len(nrow(count))
     grp <- split(sample(length(n)), cut(n, ncv))
     names(grp) <- seq_along(grp)

@@ -19,3 +19,10 @@ csubset <- function(val, x, pheno, cidx=TRUE)
         cidx <- colSums(x[ridx,]) != 0
     x[ridx, cidx]
 }
+
+count_is_integerish <- function(count)
+{
+    ## values of count matrix should be raw counts; the following is
+    ## approximate
+    max(abs(count - as.integer(count))) < 0.01
+}

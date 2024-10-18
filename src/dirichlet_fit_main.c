@@ -548,6 +548,18 @@ void dirichlet_fit_main(struct data_t *data, int rseed)
         hessian(ptHessian, aadLambda[k], data);
 
         status = gsl_linalg_LU_decomp(ptHessian, p, &signum);
+        if (status != GSL_SUCCESS) {
+            gsl_matrix_free(ptHessian);
+            gsl_matrix_free(ptInverseHessian);
+            gsl_permutation_free(p);
+
+            free(aadErr[0]); free(aadErr);
+            free(aadLambda[0]); free(aadLambda);
+            free(aadZ[0]); free(aadZ);
+            free(adW);
+
+            Rf_error("LU decompistion of a singular matrix during Hessian");
+        }
         gsl_linalg_LU_invert(ptHessian, p, ptInverseHessian);
         for (j = 0; j < S; j++) {
             aadErr[k][j] = gsl_matrix_get(ptInverseHessian, j, j);
