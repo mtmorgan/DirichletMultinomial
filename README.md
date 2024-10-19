@@ -11,7 +11,7 @@ page for this package, ?DirichletMultinomial.
 
 Install [DirichletMultinomial][] from [Bioconductor][] with:
 
-```{r}
+``` r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
@@ -40,12 +40,9 @@ brew install gsl
 
 ## Use
 
-See the [DirichletMultinomial][] landing page and [vignette][] for use.
+See the [DirichletMultinomial][] Bioconductor landing page and
+[vignette][] for use.
 
 [DirichletMultinomial]: https://bioconductor.org/packages/DirichletMultinomial
 [Bioconductor]: https://bioconductor.org
-[vignette]: https://bioconductor.org/packages/release/bioc/vignettes/DirichletMultinomial/inst/doc/DirichletMultinomial.pdf
-
-
-
-
+[vignette]: https://mtmorgan.github.io/DirichletMultinomial/articles/DirichletMultinomial.html

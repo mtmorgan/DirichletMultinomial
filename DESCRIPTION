@@ -30,3 +30,5 @@ SystemRequirements: gsl
 biocViews: ImmunoOncology, Microbiome, Sequencing, Clustering, Classification,
         Metagenomics
 VignetteBuilder: knitr
+URL: https://mtmorgan.github.io/DirichletMultinomial/
+BugReports: https://mtmorgan.github.io/DirichletMultinomial/issues
