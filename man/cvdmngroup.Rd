@@ -52,7 +52,7 @@ cvdmngroup(ncv, count, k, z, ..., verbose = FALSE,
     the posterior probability of assignment.}
 
 }
-\author{Martin Morgan \url{mailto:mtmorgan@fhcrc.org}}
+\author{Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}}
 
 \seealso{
   \code{\link{dmn}}, \link{DirichletMultinomial-package},

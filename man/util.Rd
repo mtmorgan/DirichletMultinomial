@@ -37,7 +37,7 @@ csubset(val, x, pheno, cidx = TRUE)
   row subsetting (\code{cidx=FALSE}).
 
 }
-\author{Martin Morgan \url{mailto:mtmorgan@fhcrc.org}}
+\author{Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}}
 
 \examples{
 ## count matrix

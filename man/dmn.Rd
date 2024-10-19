@@ -63,7 +63,7 @@ dmn(count, k, verbose = FALSE, seed = runif(1, 0, .Machine$integer.max))
 
 }
 \author{
-  Martin Morgan \url{mailto:mtmorgan@fhcrc.org}
+  Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}
 }
 
 \seealso{

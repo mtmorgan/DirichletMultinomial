@@ -83,7 +83,7 @@ laplace(object, ...)
 
 }
 
-\author{Martin Morgan \url{mailto:mtmorgan@fhcrc.org}}
+\author{Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}}
 
 \examples{
 data(fit)

@@ -48,7 +48,7 @@
 
 }
 \author{
-  Martin Morgan \url{mailto:mtmorgan@fhcrc.org}
+  Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}
 }
 
 \seealso{

@@ -27,5 +27,5 @@
   Metagenomics. PLoS ONE 7(2): e30126. doi:10.1371/journal.pone.0030126.
 
 }
-\author{Maintainer: Martin Morgan \url{mailto:mtmorgan@fhcrc.org}}
+\author{Maintainer: Martin Morgan \url{mailto:mtmorgan.xyz@gmail.com}}
 \keyword{package}
