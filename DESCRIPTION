@@ -31,4 +31,4 @@ biocViews: ImmunoOncology, Microbiome, Sequencing, Clustering, Classification,
         Metagenomics
 VignetteBuilder: knitr
 URL: https://mtmorgan.github.io/DirichletMultinomial/
-BugReports: https://mtmorgan.github.io/DirichletMultinomial/issues
+BugReports: https://github.com/mtmorgan/DirichletMultinomial/issues
