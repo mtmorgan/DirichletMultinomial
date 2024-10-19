@@ -2,7 +2,7 @@ Package: DirichletMultinomial
 Type: Package
 Title: Dirichlet-Multinomial Mixture Model Machine Learning for
         Microbiome Data
-Version: 1.47.1
+Version: 1.47.2
 Authors@R: person(
         "Martin", "Morgan", role = c("aut", "cre"),
         email = "mtmorgan.xyz@gmail.com",
