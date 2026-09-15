@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>DirichletMultinomial for Clustering and Classification of Microbiome Data • DirichletMultinomial</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="DirichletMultinomial for Clustering and Classification of Microbiome Data">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DirichletMultinomial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.47.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.55.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,12 +46,12 @@
 
 
 
-<link href="DirichletMultinomial_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<link href="DirichletMultinomial_files/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
 <script src="DirichletMultinomial_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><link href="DirichletMultinomial_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="DirichletMultinomial_files/datatables-binding-0.33/datatables.js"></script><link href="DirichletMultinomial_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<script src="DirichletMultinomial_files/datatables-binding-0.34.0/datatables.js"></script><link href="DirichletMultinomial_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
 <link href="DirichletMultinomial_files/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
-<script src="DirichletMultinomial_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script><link href="DirichletMultinomial_files/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
-<script src="DirichletMultinomial_files/crosstalk-1.2.1/js/crosstalk.min.js"></script><div class="row">
+<script src="DirichletMultinomial_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script><link href="DirichletMultinomial_files/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="DirichletMultinomial_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>DirichletMultinomial for Clustering and Classification of Microbiome Data</h1>
@@ -59,7 +59,7 @@
 Morgan</h4>
             <address class="author_afil">
       Roswell Park Comprehensive Cancer Center, Buffalo,
-NY<br><h4 data-toc-skip class="date">19 October 2024</h4>
+NY<br><h4 data-toc-skip class="date">15 September 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mtmorgan/DirichletMultinomial/blob/devel/vignettes/DirichletMultinomial.Rmd" class="external-link"><code>vignettes/DirichletMultinomial.Rmd</code></a></small>
       <div class="d-none name"><code>DirichletMultinomial.Rmd</code></div>
@@ -112,7 +112,7 @@ a log scale.</p>
 <span>    <span class="va">cnts</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">cnts</span><span class="op">)</span>,</span>
 <span>    xlab<span class="op">=</span><span class="st">"Taxon representation (log 10 count)"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="DirichletMultinomial_files/figure-html/taxon-counts-1.png" width="700"></p>
+<p><img src="DirichletMultinomial_files/figure-html/taxon-counts-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clustering">Clustering<a class="anchor" aria-label="anchor" href="#clustering"></a>
@@ -147,7 +147,7 @@ distinct Dirichlet components.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lplc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">laplace</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lplc</span>, type<span class="op">=</span><span class="st">"b"</span>, xlab<span class="op">=</span><span class="st">"Number of Dirichlet Components"</span>, ylab<span class="op">=</span><span class="st">"Model Fit"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DirichletMultinomial_files/figure-html/min-laplace-1.png" width="700"></p>
+<p><img src="DirichletMultinomial_files/figure-html/min-laplace-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">best</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">lplc</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; class: DMN </span></span>
@@ -184,7 +184,7 @@ the Dirichlet components are correlated, perhaps reflecting overall
 numerical abundance.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/lattice/man/splom.html" class="external-link">splom</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">best</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DirichletMultinomial_files/figure-html/fitted-1.png" width="700"></p>
+<p><img src="DirichletMultinomial_files/figure-html/fitted-1.png" class="r-plt" alt="" width="700"></p>
 <p>The posterior mean difference between the best and single-component
 Dirichlet multinomial model measures how each component differs from the
 population average; the sum is a measure of total difference from the
@@ -213,7 +213,7 @@ samples placed into the component for which they had the largest fitted
 value.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/heatmapdmn.html">heatmapdmn</a></span><span class="op">(</span><span class="va">count</span>, <span class="va">fit</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">best</span>, <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DirichletMultinomial_files/figure-html/heatmap-similarity-1.png" width="700"></p>
+<p><img src="DirichletMultinomial_files/figure-html/heatmap-similarity-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="generative-classifier">Generative classifier<a class="anchor" aria-label="anchor" href="#generative-classifier"></a>
@@ -318,16 +318,16 @@ two-group classifier.</p>
 <span>    auto.key<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lines<span class="op">=</span><span class="cn">TRUE</span>, points<span class="op">=</span><span class="cn">FALSE</span>, x<span class="op">=</span><span class="fl">.6</span>, y<span class="op">=</span><span class="fl">.1</span><span class="op">)</span>,</span>
 <span>    xlab<span class="op">=</span><span class="st">"False Positive"</span>, ylab<span class="op">=</span><span class="st">"True Positive"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="DirichletMultinomial_files/figure-html/ROC-dmngroup-1.png" width="700"></p>
+<p><img src="DirichletMultinomial_files/figure-html/ROC-dmngroup-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C          </span></span>
@@ -345,22 +345,23 @@ two-group classifier.</p>
 <span><span class="co">#&gt; [7] datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] lattice_0.22-6              DirichletMultinomial_1.47.2</span></span>
-<span><span class="co">#&gt; [3] IRanges_2.38.1              S4Vectors_0.42.1           </span></span>
-<span><span class="co">#&gt; [5] BiocGenerics_0.50.0         BiocStyle_2.32.1           </span></span>
+<span><span class="co">#&gt; [1] lattice_0.22-9              DirichletMultinomial_1.55.0</span></span>
+<span><span class="co">#&gt; [3] IRanges_2.46.0              S4Vectors_0.50.2           </span></span>
+<span><span class="co">#&gt; [5] BiocGenerics_0.58.1         generics_0.1.4             </span></span>
+<span><span class="co">#&gt; [7] BiocStyle_2.40.0           </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] cli_3.6.3           knitr_1.48          rlang_1.1.4        </span></span>
-<span><span class="co">#&gt;  [4] xfun_0.48           highr_0.11          textshaping_0.4.0  </span></span>
-<span><span class="co">#&gt;  [7] jsonlite_1.8.9      DT_0.33             htmltools_0.5.8.1  </span></span>
-<span><span class="co">#&gt; [10] ragg_1.3.3          sass_0.4.9          rmarkdown_2.28     </span></span>
-<span><span class="co">#&gt; [13] grid_4.4.1          crosstalk_1.2.1     evaluate_1.0.1     </span></span>
-<span><span class="co">#&gt; [16] jquerylib_0.1.4     fastmap_1.2.0       yaml_2.3.10        </span></span>
-<span><span class="co">#&gt; [19] lifecycle_1.0.4     bookdown_0.41       BiocManager_1.30.25</span></span>
-<span><span class="co">#&gt; [22] compiler_4.4.1      fs_1.6.4            htmlwidgets_1.6.4  </span></span>
-<span><span class="co">#&gt; [25] systemfonts_1.1.0   digest_0.6.37       R6_2.5.1           </span></span>
-<span><span class="co">#&gt; [28] magrittr_2.0.3      bslib_0.8.0         tools_4.4.1        </span></span>
-<span><span class="co">#&gt; [31] pkgdown_2.1.1       cachem_1.1.0        desc_1.4.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] cli_3.6.6           knitr_1.52          rlang_1.3.0        </span></span>
+<span><span class="co">#&gt;  [4] xfun_0.60           otel_0.2.0          textshaping_1.0.5  </span></span>
+<span><span class="co">#&gt;  [7] jsonlite_2.0.0      DT_0.34.0           htmltools_0.5.9    </span></span>
+<span><span class="co">#&gt; [10] ragg_1.5.2          sass_0.4.10         rmarkdown_2.32     </span></span>
+<span><span class="co">#&gt; [13] grid_4.6.1          crosstalk_1.2.2     evaluate_1.0.5     </span></span>
+<span><span class="co">#&gt; [16] jquerylib_0.1.4     fastmap_1.2.0       yaml_2.3.12        </span></span>
+<span><span class="co">#&gt; [19] lifecycle_1.0.5     bookdown_0.48       BiocManager_1.30.27</span></span>
+<span><span class="co">#&gt; [22] compiler_4.6.1      fs_2.1.0            htmlwidgets_1.6.4  </span></span>
+<span><span class="co">#&gt; [25] systemfonts_1.3.2   digest_0.6.39       R6_2.6.1           </span></span>
+<span><span class="co">#&gt; [28] magrittr_2.0.5      bslib_0.12.0        tools_4.6.1        </span></span>
+<span><span class="co">#&gt; [31] pkgdown_2.2.1       cachem_1.1.0        desc_1.4.3</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -373,7 +374,7 @@ two-group classifier.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
