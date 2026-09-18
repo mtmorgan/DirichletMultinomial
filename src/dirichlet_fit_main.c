@@ -7,8 +7,19 @@
 
 #include <Rdefines.h>
 #include "dirichlet_fit_main.h"
+
 /* re-map to R transient memory allocation */
-#define calloc(_nelm, _elsize) R_alloc(_nelm, _elsize)
+static inline void *r_calloc(size_t nelem, size_t eltsize) {
+    if (eltsize > 2147483647) {
+        Rf_error("`dmn()` r_calloc: trying to use too much memory");
+    }
+    void *ptr = R_alloc(nelem, (int) eltsize);
+    if (ptr) {
+        memset(ptr, 0, nelem * eltsize);
+    }
+    return ptr;
+}
+#define calloc r_calloc
 #define free(_ptr) (void) _ptr
 
 const double BIG_DBL = 1.0e9;
@@ -388,9 +399,9 @@ static void hessian(gsl_matrix* ptHessian, const double* adLambda,
         const double dPsi1Alpha = gsl_sf_psi_1(adAlpha[j]);
         for (i = 0; i < N; i++) {
             const int n = aanX[j * N + i];
-            adCJK0[j] += adPi[i] * n ? gsl_sf_psi(adAlpha[j] + n) : dPsiAlpha;
+            adCJK0[j] += adPi[i] && n ? gsl_sf_psi(adAlpha[j] + n) : dPsiAlpha;
             adAJK0[j] += adPi[i] * dPsiAlpha;
-            adCJK[j] += adPi[i] * n ? gsl_sf_psi_1(adAlpha[j] + n): dPsi1Alpha;
+            adCJK[j] += adPi[i] && n ? gsl_sf_psi_1(adAlpha[j] + n): dPsi1Alpha;
             adAJK[j] += adPi[i] * dPsi1Alpha;
         }
     }
@@ -586,4 +597,5 @@ void dirichlet_fit_main(struct data_t *data, int rseed)
     free(aadLambda[0]); free(aadLambda);
     free(aadZ[0]); free(aadZ);
     free(adW);
+    gsl_rng_free(ptGSLRNG);
 }
