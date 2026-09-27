@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/mtmorgan/DirichletMultinomial/blob/devel/DESCRIPTION)
 
 Morgan M (2026). *DirichletMultinomial: Dirichlet-Multinomial Mixture
-Model Machine Learning for Microbiome Data*. R package version 1.55.0,
+Model Machine Learning for Microbiome Data*. R package version 1.55.1,
 <https://mtmorgan.github.io/DirichletMultinomial/>.
 
     @Manual{,
       title = {DirichletMultinomial: Dirichlet-Multinomial Mixture Model Machine Learning for Microbiome Data},
       author = {Martin Morgan},
       year = {2026},
-      note = {R package version 1.55.0},
+      note = {R package version 1.55.1},
       url = {https://mtmorgan.github.io/DirichletMultinomial/},
     }

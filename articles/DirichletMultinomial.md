@@ -341,14 +341,14 @@ sessionInfo()
 #> [7] datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] lattice_0.22-9              DirichletMultinomial_1.55.0
-#> [3] IRanges_2.46.0              S4Vectors_0.50.2           
+#> [1] lattice_0.22-9              DirichletMultinomial_1.55.1
+#> [3] IRanges_2.46.0              S4Vectors_0.50.3           
 #> [5] BiocGenerics_0.58.1         generics_0.1.4             
 #> [7] BiocStyle_2.40.0           
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] cli_3.6.6           knitr_1.52          rlang_1.3.0        
-#>  [4] xfun_0.60           otel_0.2.0          textshaping_1.0.5  
+#>  [4] xfun_0.61           otel_0.2.0          textshaping_1.0.5  
 #>  [7] jsonlite_2.0.0      DT_0.34.0           htmltools_0.5.9    
 #> [10] ragg_1.5.2          sass_0.4.10         rmarkdown_2.32     
 #> [13] grid_4.6.1          crosstalk_1.2.2     evaluate_1.0.5     
