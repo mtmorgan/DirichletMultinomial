@@ -7,6 +7,10 @@ interface to code originally made available by Holmes, Harris, and
 Quince, 2012, PLoS ONE 7(2): 1-15, as discussed further in the man
 page for this package, ?DirichletMultinomial.
 
+Version 1.54.1 / 1.55.1 fixed an important memory allocation bug in `dmn()`;
+users are encouraged to rerun analyses with these or later versions of the
+package.
+
 ## Installation
 
 Install [DirichletMultinomial][] from [Bioconductor][] with:
